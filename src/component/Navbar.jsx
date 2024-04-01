@@ -11,9 +11,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import {Restaurant, Search, ShoppingCart} from "@mui/icons-material";
-import {Link} from "react-router-dom";
-import {useSelector} from "react-redux";
+import {ExitToApp, Restaurant, Search, ShoppingCart} from "@mui/icons-material";
+import {Link, NavLink, useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {BASE_URL, navigationLinks} from "./db.jsx";
+import {userLogout} from "../redux/slice/authSlice.jsx";
 
 
 export default function Navbar() {
@@ -21,6 +23,21 @@ export default function Navbar() {
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
     const {cartItems} = useSelector((state) => state.cart)
+    const {isLogging} = useSelector((state) => state.auth)
+    const  dispatch = useDispatch()
+const navigate = useNavigate()
+
+    function logout() {
+        fetch(BASE_URL + "/auth/logout", {
+            method: "POST",
+            body: {}
+        }).then(res => res.json()).then((data) => console.log(data)).catch((error) => console.log(error))
+        dispatch(userLogout())
+        navigate("/signin")
+
+    }
+
+
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -82,13 +99,13 @@ export default function Navbar() {
             onClose={handleMobileMenuClose}
         >
             <MenuItem>
-               <Link to="/cart">
-                   <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                       <Badge badgeContent={cartItems.length === 0 ? "0" : cartItems.length} color="error">
-                           <ShoppingCart/>
-                       </Badge>
-                   </IconButton>
-               </Link>
+                <Link to="/cart">
+                    <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                        <Badge badgeContent={cartItems.length === 0 ? "0" : cartItems.length} color="error">
+                            <ShoppingCart/>
+                        </Badge>
+                    </IconButton>
+                </Link>
                 <p>Messages</p>
             </MenuItem>
             <MenuItem>
@@ -144,41 +161,99 @@ export default function Navbar() {
                     </Typography>
 
                     <Box sx={{flexGrow: 1}}/>
-                    <Box sx={{display: {xs: 'none', md: 'flex'}}}>
-                        <IconButton size="large" aria-label="show 4 new mails" color="inherit" sx={{
-                            ":hover": {color: "#FC8019"},
-                            backgroundColor: "white"
-                        }}>
-                            <Search/>
-                        </IconButton>
-                        <Link to="/cart">
-                        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                            <Badge badgeContent={cartItems.length === 0 ? "0" : cartItems.length} color="error">
-                                <ShoppingCart/>
-                            </Badge>
-                        </IconButton>
-                        </Link>
-                        <IconButton
-                            size="large"
-                            aria-label="show 17 new notifications"
-                            color="inherit"
-                        >
-                            <Badge badgeContent={"0"} color="error">
-                                <NotificationsIcon/>
-                            </Badge>
-                        </IconButton>
-                        <IconButton
-                            size="large"
-                            edge="end"
-                            aria-label="account of current user"
-                            aria-controls={menuId}
-                            aria-haspopup="true"
-                            onClick={handleProfileMenuOpen}
-                            color="inherit"
-                        >
-                            <AccountCircle/>
-                        </IconButton>
-                    </Box>
+
+                    {
+                        isLogging === true ? <Box sx={{display: {xs: 'none', md: 'flex'}}}>
+                                {navigationLinks.map((nav, index) => (
+                                    <NavLink key={index} to={nav.path}>
+
+                                        <IconButton size="large" aria-label={`show ${cartItems.length} new mails`}
+                                                    color="inherit" sx={{
+
+
+                                            '&:hover': {
+                                                backgroundColor: 'transparent',
+                                                borderColor: 'none',
+                                                color: "#fff",
+                                                boxShadow: 'none',
+                                                borderRadius: "0px",
+                                                border: "0px"
+                                            },
+                                        }}>
+                                            {
+                                                nav.text === 'Cart' ?
+                                                    <Badge badgeContent={cartItems.length === 0 ? "0" : cartItems.length}
+                                                           color="error" sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        color: "#FC8019",
+
+                                                    }}>
+                                                        {nav.icon}
+                                                    </Badge> :
+                                                    <Badge badgeContent={0} color="error" sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        fontSize: "1rem",
+                                                        color: "#FC8019"
+                                                    }}>
+
+                                                        {nav.icon} <span className="text-slate-800"> {nav.text}</span>
+                                                    </Badge>
+                                            }
+                                        </IconButton>
+                                    </NavLink>
+                                ))}
+
+                                <IconButton onClick={logout} size="large" aria-label="show 4 new mails" color="inherit"  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    fontSize: "1rem",
+                                    color: "#FC8019"
+                                }}>
+                                    <ExitToApp/> Sign Out
+                                </IconButton>
+
+                            </Box>
+                            :
+                            (<Box sx={{display: {xs: 'none', md: 'flex'}}}>
+                                <IconButton size="large" aria-label="show 4 new mails" color="inherit" sx={{
+                                    ":hover": {color: "#FC8019"},
+                                    backgroundColor: "white"
+                                }}>
+                                    <Search/>
+                                </IconButton>
+                                <Link to="/cart">
+                                    <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                                        <Badge badgeContent={cartItems.length === 0 ? "0" : cartItems.length}
+                                               color="error">
+                                            <ShoppingCart/>
+                                        </Badge>
+                                    </IconButton>
+                                </Link>
+                                <IconButton
+                                    size="large"
+                                    aria-label="show 17 new notifications"
+                                    color="inherit"
+                                >
+                                    <Badge badgeContent={"0"} color="error">
+                                        <NotificationsIcon/>
+                                    </Badge>
+                                </IconButton>
+                                <IconButton
+                                    size="large"
+                                    edge="end"
+                                    aria-label="account of current user"
+                                    aria-controls={menuId}
+                                    aria-haspopup="true"
+                                    onClick={handleProfileMenuOpen}
+                                    color="inherit"
+                                >
+                                    <AccountCircle/>
+                                </IconButton>
+                            </Box>)
+                    }
+
                     <Box sx={{display: {xs: 'flex', md: 'none'}}}>
                         <IconButton
                             size="large"
@@ -193,9 +268,15 @@ export default function Navbar() {
                     </Box>
                 </Toolbar>
             </AppBar>
-            {renderMobileMenu}
-            {renderMenu}
+            {
+                renderMobileMenu
+            }
+            {
+                renderMenu
+            }
         </Box>
-    );
+    )
+        ;
 }
+
 

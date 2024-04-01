@@ -1,3 +1,5 @@
+import {ExitToApp, Info, Restaurant, ShoppingCart} from "@mui/icons-material";
+
 export const restaurantData =[
   {
     "restaurantName":"Box-8 Desi Meals",
@@ -2435,3 +2437,29 @@ export const restaurantData =[
     ]
   }
 ]
+
+
+export  const   navigationLinks = [
+
+  {
+    "text": "Cart",
+    "path": "/cart",
+    "icon": <ShoppingCart/>
+  },
+    {
+      "text": "Orders",
+      "path": "/dashboard/orders",
+      "icon": <Info/>
+    },
+    {
+      "text": "Restaurants",
+      "path": "/",
+      "icon": <Restaurant/>
+    },
+
+  ]
+
+
+
+
+export  const BASE_URL = "http://localhost:4000/api/v1"
