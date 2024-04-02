@@ -12,7 +12,7 @@ const RestaurantCard = ({restaurant}) => {
     };
 
     return (
-        <Link to={`/menu/${restaurant.restaurantName}`}>
+        <Link to={`/menu/${restaurant._id}`}>
         <Card style={{width: "250px"}}>
             <CardMedia
                 style={mediaStyle}
