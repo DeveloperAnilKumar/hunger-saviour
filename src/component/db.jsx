@@ -2448,7 +2448,7 @@ export  const   navigationLinks = [
   },
     {
       "text": "Orders",
-      "path": "/dashboard/orders",
+      "path": "/orders",
       "icon": <Info/>
     },
     {
