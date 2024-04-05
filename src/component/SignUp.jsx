@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,36 +12,60 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { BASE_URL } from "./db.jsx";
 
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Hunger Saviour
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+function SignUp() {
+    const defaultTheme = createTheme();
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        role: 'USER'
+    });
 
-
-const defaultTheme = createTheme();
-
-export default function SignUp() {
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setFormData({
+            ...formData,
+            [name]: value
         });
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await fetch(BASE_URL + "/auth/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Sign up failed');
+            }
+
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                role: 'USER'
+            });
+
+            const responseData = await response.json();
+            console.log(responseData);
+            // Redirect or display success message
+        } catch (error) {
+            console.error('Error:', error);alert(error.response.message)
+        }
     };
 
     return (
         <ThemeProvider theme={defaultTheme}>
-            <Container component="main"  maxWidth="xs">
+            <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <Box
                     sx={{
@@ -63,6 +87,8 @@ export default function SignUp() {
                                 <TextField
                                     autoComplete="given-name"
                                     name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
                                     required
                                     fullWidth
                                     id="firstName"
@@ -77,6 +103,8 @@ export default function SignUp() {
                                     id="lastName"
                                     label="Last Name"
                                     name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
                                     autoComplete="family-name"
                                 />
                             </Grid>
@@ -87,6 +115,8 @@ export default function SignUp() {
                                     id="email"
                                     label="Email Address"
                                     name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
                                     autoComplete="email"
                                 />
                             </Grid>
@@ -98,13 +128,15 @@ export default function SignUp() {
                                     label="Password"
                                     type="password"
                                     id="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
                                     autoComplete="new-password"
                                 />
                             </Grid>
                             <Grid item xs={12}>
                                 <FormControlLabel
                                     control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                    label="I agree termn of condition."
+                                    label="I agree term of condition."
                                 />
                             </Grid>
                         </Grid>
@@ -118,21 +150,16 @@ export default function SignUp() {
                         </Button>
                         <Grid container justifyContent="flex-end">
                             <Grid item>
-                                <Link href="signin" variant="body2">
+                                <Link href="/signin" variant="body2">
                                     Already have an account? Sign in
                                 </Link>
                             </Grid>
                         </Grid>
                     </Box>
                 </Box>
-                <Copyright sx={{ mt: 5 }} />
             </Container>
         </ThemeProvider>
-
-
-
     );
-
 }
 
-
+export default SignUp;

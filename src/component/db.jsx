@@ -1,4 +1,4 @@
-import {ExitToApp, Info, Restaurant, ShoppingCart} from "@mui/icons-material";
+import { Info, Restaurant, ShoppingCart} from "@mui/icons-material";
 
 export const restaurantData =[
   {

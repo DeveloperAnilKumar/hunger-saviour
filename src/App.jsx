@@ -7,7 +7,7 @@ import RestaurantMenu from "./component/RestaurantMenu.jsx";
 import CartItems from "./component/CartItems.jsx";
 import {useEffect} from "react";
 import {BASE_URL} from "./component/db.jsx";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {getAllCartItems} from "./redux/slice/cartSlice.jsx";
 import Orders from "./component/Orders.jsx";
 
@@ -16,13 +16,18 @@ function App() {
 
     const  dispatch = useDispatch()
 
+    const {user} = useSelector((state)=> state.auth)
+
     useEffect(() => {
-        fetch(BASE_URL +"/cart/items").then(res=> res.json())
-            .then(data=> dispatch(getAllCartItems(data)) )
-            .catch((err)=>{
-                console.log(err)
-            })
-    }, []);
+        if (user) {
+            fetch(BASE_URL + "/cart/items/" + user._id)
+                .then((res) => res.json())
+                .then((data) => dispatch(getAllCartItems(data)))
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    }, [dispatch,user]);
 
 
 

@@ -3,7 +3,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Delete, Star} from "@mui/icons-material";
 import {Button} from "@mui/material";
 import {BASE_URL} from "./db.jsx";
-import {decrement, increment, removeItem} from "../redux/slice/cartSlice.jsx";
+import {clearCart, decrement, increment, removeItem} from "../redux/slice/cartSlice.jsx";
+import {useNavigate} from "react-router-dom";
 
 const CartItems = () => {
     const {cartItems} = useSelector((state) => state.cart);
@@ -14,7 +15,6 @@ const CartItems = () => {
     const decreaseQuantity = (menu) => {
 
         let newQuantity = menu.quantity - 1;
-
 
             const menuItem = {...menu, quantity: newQuantity};
         if (menuItem.quantity>0){
@@ -69,6 +69,7 @@ const CartItems = () => {
             });
     };
 
+    const  navigate = useNavigate();
 
     const calculateItemPrice = () => {
         return cartItems.reduce((acc, cur)=> acc + cur.quantity * cur.restaurantMenu.menuItemPrice,0)
@@ -145,7 +146,8 @@ const CartItems = () => {
                         orderStatus: "ORDER_APPROVED",
                         totalPrice: calculateItemPrice(),
                         transactionId: data.transactionId,
-                        orderItem: [...cartItems]
+                        orderItem: [...cartItems],
+                        userId:user._id
                     };
 
                     fetch(BASE_URL + '/order', {
@@ -158,6 +160,9 @@ const CartItems = () => {
                         .then(res => res.json())
                         .then(data => {
                             clearCartItems(user._id);
+                            navigate("/orders")
+                            dispatch(clearCart())
+
                         })
                         .catch(error => {
                             console.error('Error creating order:', error);

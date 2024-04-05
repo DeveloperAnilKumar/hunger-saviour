@@ -5,7 +5,6 @@ import {Link} from "react-router-dom";
 
 const RestaurantCard = ({restaurant}) => {
 
-
     const mediaStyle = {
         height: 0,
         paddingTop: '56.25%',

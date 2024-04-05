@@ -15,12 +15,13 @@ import {createTheme, ThemeProvider} from '@mui/material/styles';
 import {BASE_URL} from "./db.jsx";
 import {useDispatch} from "react-redux";
 import {getUserDetails} from "../redux/slice/authSlice.jsx";
+import {useNavigate} from "react-router-dom";
 
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
+            <Link color="inherit" href="#">
                 Hunger Saviour
             </Link>{' '}
             {new Date().getFullYear()}
@@ -36,6 +37,7 @@ export default function SignIn() {
 
     const  dispatch = useDispatch()
 
+    const navigate = useNavigate()
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -60,6 +62,7 @@ export default function SignIn() {
             .then(data => {
                 dispatch(getUserDetails(data.user))
                 alert("login succesfully")
+                navigate("/")
             })
             .catch(error => {
                 console.log(error);

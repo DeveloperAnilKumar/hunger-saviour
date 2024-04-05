@@ -16,6 +16,7 @@ import {Link, NavLink, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {BASE_URL, navigationLinks} from "./db.jsx";
 import {userLogout} from "../redux/slice/authSlice.jsx";
+import Avatar from "@mui/material/Avatar";
 
 
 export default function Navbar() {
@@ -23,9 +24,10 @@ export default function Navbar() {
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
     const {cartItems} = useSelector((state) => state.cart)
-    const {isLogging} = useSelector((state) => state.auth)
-    const  dispatch = useDispatch()
-const navigate = useNavigate()
+    const {isLogging, user} = useSelector((state) => state.auth)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
 
     function logout() {
         fetch(BASE_URL + "/auth/logout", {
@@ -35,8 +37,8 @@ const navigate = useNavigate()
         dispatch(userLogout())
         navigate("/signin")
 
-    }
 
+    }
 
 
     const isMenuOpen = Boolean(anchorEl);
@@ -80,6 +82,17 @@ const navigate = useNavigate()
             <MenuItem onClick={handleMenuClose}> <Link to="signup"> SignUp </Link> </MenuItem>
         </Menu>
     );
+
+    // <IconButton onClick={logout} size="large" aria-label="show 4 new mails" color="inherit"
+    //             sx={{
+    //                 display: "flex",
+    //                 alignItems: "center",
+    //                 fontSize: "1rem",
+    //                 color: "#FC8019"
+    //             }}>
+    //     <ExitToApp/> Sign Out
+    // </IconButton>
+
 
     const mobileMenuId = 'primary-search-account-menu-mobile';
     const renderMobileMenu = (
@@ -205,41 +218,8 @@ const navigate = useNavigate()
                                     </NavLink>
                                 ))}
 
-                                <IconButton onClick={logout} size="large" aria-label="show 4 new mails" color="inherit"  sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    fontSize: "1rem",
-                                    color: "#FC8019"
-                                }}>
-                                    <ExitToApp/> Sign Out
-                                </IconButton>
 
-                            </Box>
-                            :
-                            (<Box sx={{display: {xs: 'none', md: 'flex'}}}>
-                                <IconButton size="large" aria-label="show 4 new mails" color="inherit" sx={{
-                                    ":hover": {color: "#FC8019"},
-                                    backgroundColor: "white"
-                                }}>
-                                    <Search/>
-                                </IconButton>
-                                <Link to="/cart">
-                                    <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                                        <Badge badgeContent={cartItems.length === 0 ? "0" : cartItems.length}
-                                               color="error">
-                                            <ShoppingCart/>
-                                        </Badge>
-                                    </IconButton>
-                                </Link>
-                                <IconButton
-                                    size="large"
-                                    aria-label="show 17 new notifications"
-                                    color="inherit"
-                                >
-                                    <Badge badgeContent={"0"} color="error">
-                                        <NotificationsIcon/>
-                                    </Badge>
-                                </IconButton>
+
                                 <IconButton
                                     size="large"
                                     edge="end"
@@ -248,8 +228,62 @@ const navigate = useNavigate()
                                     aria-haspopup="true"
                                     onClick={handleProfileMenuOpen}
                                     color="inherit"
-                                >
-                                    <AccountCircle/>
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        fontSize: "1rem",
+                                        color: "#FC8019"
+                                    }}>
+
+                                    <Avatar src={user.image}  sx={{ width: 24, height: 24 }} /> <span className="text-slate-800 mx-1 capitalize">  {user.firstName} {user.lastName} </span>
+                                </IconButton>
+
+                            </Box>
+                            :
+                            (<Box sx={{display: {xs: 'none', md: 'flex'}}}>
+                                <IconButton size="large" aria-label="show 4 new mails" color="inherit"
+                                    sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    fontSize: "1rem",
+                                    color: "#FC8019"
+                                }}>
+
+                                    <Search/>
+                                </IconButton>
+                                <Link to="/signin">
+                                    <IconButton size="large" aria-label="show 4 new mails" color="inherit"
+
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    fontSize: "1rem",
+                                                    color: "#FC8019"
+                                                }}>
+
+                                        <Badge badgeContent={"0"}
+                                               color="error">
+                                            <ShoppingCart/>
+                                        </Badge>
+                                    </IconButton>
+                                </Link>
+
+                                <IconButton
+                                    size="large"
+                                    edge="end"
+                                    aria-label="account of current user"
+                                    aria-controls={menuId}
+                                    aria-haspopup="true"
+                                    onClick={handleProfileMenuOpen}
+                                    color="inherit"
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        fontSize: "1rem",
+                                        color: "#FC8019"
+                                    }}>
+
+                                    <AccountCircle/> <span className="text-slate-800">user </span>
                                 </IconButton>
                             </Box>)
                     }
