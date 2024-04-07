@@ -9,19 +9,22 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import MoreIcon from '@mui/icons-material/MoreVert';
-import {ExitToApp, Restaurant, Search, ShoppingCart} from "@mui/icons-material";
+import {ExitToApp, Lock, Person, Restaurant, Search, ShoppingCart} from "@mui/icons-material";
 import {Link, NavLink, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {BASE_URL, navigationLinks} from "./db.jsx";
 import {userLogout} from "../redux/slice/authSlice.jsx";
 import Avatar from "@mui/material/Avatar";
+import {Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
+import {useState} from "react";
 
 
 export default function Navbar() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+
+    const [drawerOpen, setDrawerOpen] = useState(false);
+
 
     const {cartItems} = useSelector((state) => state.cart)
     const {isLogging, user} = useSelector((state) => state.auth)
@@ -35,14 +38,13 @@ export default function Navbar() {
             body: {}
         }).then(res => res.json()).then((data) => console.log(data)).catch((error) => console.log(error))
         dispatch(userLogout())
+        handleMenuClose()
         navigate("/signin")
 
 
     }
 
 
-    const isMenuOpen = Boolean(anchorEl);
-    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -57,96 +59,114 @@ export default function Navbar() {
         handleMobileMenuClose();
     };
 
-    const handleMobileMenuOpen = (event) => {
-        setMobileMoreAnchorEl(event.currentTarget);
+
+
+    const handleDrawerClose = () => {
+        setDrawerOpen(false);
+    };
+
+    const handleDrawerOpen = () => {
+        setDrawerOpen(true);
     };
 
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
         <Menu
             anchorEl={anchorEl}
-            anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-            }}
-            id={menuId}
-            keepMounted
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            open={isMenuOpen}
+            open={Boolean(anchorEl)}
             onClose={handleMenuClose}
         >
-            <MenuItem onClick={handleMenuClose}> <Link to="signin"> SignIn </Link> </MenuItem>
-            <MenuItem onClick={handleMenuClose}> <Link to="signup"> SignUp </Link> </MenuItem>
+            {isLogging ? (
+                [
+                    <MenuItem key="profile" onClick={handleMenuClose} component={Link} to="/profile">
+                        <Person sx={{ marginRight: 1 }} /> Profile
+                    </MenuItem>,
+                    <MenuItem key="signout" onClick={logout}>
+                        <ExitToApp sx={{ marginRight: 1 }} /> Sign Out
+                    </MenuItem>
+                ]
+            ) : (
+                [
+                    <MenuItem key="signin" onClick={handleMenuClose} component={Link} to="/signin">
+                        <Lock sx={{ marginRight: 1 }} /> Sign In
+                    </MenuItem>,
+                    <MenuItem key="signup" onClick={handleMenuClose} component={Link} to="/signup">
+                        <Person sx={{ marginRight: 1 }} /> Sign Up
+                    </MenuItem>
+                ]
+            )}
         </Menu>
     );
 
-    // <IconButton onClick={logout} size="large" aria-label="show 4 new mails" color="inherit"
-    //             sx={{
-    //                 display: "flex",
-    //                 alignItems: "center",
-    //                 fontSize: "1rem",
-    //                 color: "#FC8019"
-    //             }}>
-    //     <ExitToApp/> Sign Out
-    // </IconButton>
 
 
-    const mobileMenuId = 'primary-search-account-menu-mobile';
-    const renderMobileMenu = (
-        <Menu
-            anchorEl={mobileMoreAnchorEl}
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            id={mobileMenuId}
-            keepMounted
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            open={isMobileMenuOpen}
-            onClose={handleMobileMenuClose}
-        >
-            <MenuItem>
-                <Link to="/cart">
-                    <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                        <Badge badgeContent={cartItems.length === 0 ? "0" : cartItems.length} color="error">
-                            <ShoppingCart/>
-                        </Badge>
-                    </IconButton>
-                </Link>
-                <p>Messages</p>
-            </MenuItem>
-            <MenuItem>
-                <IconButton
-                    size="large"
-                    aria-label="show 17 new notifications"
-                    color="inherit"
-                >
-                    <Badge badgeContent={17} color="error">
-                        <NotificationsIcon/>
-                    </Badge>
-                </IconButton>
-                <p>Notifications</p>
-            </MenuItem>
-            <MenuItem onClick={handleProfileMenuOpen}>
-                <IconButton
-                    size="large"
-                    aria-label="account of current user"
-                    aria-controls="primary-search-account-menu"
-                    aria-haspopup="true"
-                    color="inherit"
-                >
-                    <AccountCircle/>
-                </IconButton>
-                <p>Profile</p>
-            </MenuItem>
-        </Menu>
+
+    const drawerContent = (
+        <Box sx={{ width: 250 }} role="presentation" onClick={handleDrawerClose}>
+            <List>
+                {
+                    isLogging &&
+                        navigationLinks.map((nav, index) => (
+                            <ListItem key={index} disablePadding component={NavLink} to={nav.path}
+
+                            >
+                                <ListItemButton   >
+                                    <ListItemIcon  sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        fontSize: "1rem",
+                                        color: "#FC8019"
+                                    }}>
+                                        {nav.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={nav.text} />
+                                </ListItemButton>
+                            </ListItem>
+                        ))
+                }
+            </List>
+
+            <List>
+                {isLogging ? (
+                    <>
+                        <ListItem  component={Link} to="/profile">
+                            <ListItemIcon>
+                                <Avatar src={user.image}  sx={{ width: 24, height: 24 }} />
+                            </ListItemIcon>
+                            <ListItemText sx={{
+                                textTransform:"capitalize"
+                            }} primary= {`${user.firstName} ${user.lastName}`} />
+                        </ListItem>
+                        <ListItem  onClick={logout}>
+                            <ListItemIcon>
+                                <ExitToApp />
+                            </ListItemIcon>
+                            <ListItemText primary="Sign Out" />
+                        </ListItem>
+                    </>
+                ) : (
+                    <>
+                        <ListItem  component={Link} to="/signin">
+                            <ListItemIcon>
+                                <Lock />
+                            </ListItemIcon>
+                            <ListItemText primary="Sign In" />
+                        </ListItem>
+                        <ListItem  component={Link} to="/signup">
+                            <ListItemIcon>
+                                <Person />
+                            </ListItemIcon>
+                            <ListItemText primary="Sign Up" />
+                        </ListItem>
+                    </>
+                )}
+            </List>
+        </Box>
     );
+
+
+
+    const isMobileSize = "md"
 
     return (
         <Box sx={{flexGrow: 1}}>
@@ -160,6 +180,7 @@ export default function Navbar() {
                         color="inherit"
                         aria-label="open drawer"
                         sx={{mr: 2}}
+                        onClick={handleDrawerOpen}
                     >
                         <MenuIcon/>
 
@@ -182,7 +203,6 @@ export default function Navbar() {
 
                                         <IconButton size="large" aria-label={`show ${cartItems.length} new mails`}
                                                     color="inherit" sx={{
-
 
                                             '&:hover': {
                                                 backgroundColor: 'transparent',
@@ -242,12 +262,12 @@ export default function Navbar() {
                             :
                             (<Box sx={{display: {xs: 'none', md: 'flex'}}}>
                                 <IconButton size="large" aria-label="show 4 new mails" color="inherit"
-                                    sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    fontSize: "1rem",
-                                    color: "#FC8019"
-                                }}>
+                                            sx={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                fontSize: "1rem",
+                                                color: "#FC8019"
+                                            }}>
 
                                     <Search/>
                                 </IconButton>
@@ -283,31 +303,22 @@ export default function Navbar() {
                                         color: "#FC8019"
                                     }}>
 
-                                    <AccountCircle/> <span className="text-slate-800">user </span>
+                                    <AccountCircle/> <span className="text-slate-800 capitalize mx-2">user </span>
                                 </IconButton>
                             </Box>)
                     }
 
-                    <Box sx={{display: {xs: 'flex', md: 'none'}}}>
-                        <IconButton
-                            size="large"
-                            aria-label="show more"
-                            aria-controls={mobileMenuId}
-                            aria-haspopup="true"
-                            onClick={handleMobileMenuOpen}
-                            color="inherit"
-                        >
-                            <MoreIcon/>
-                        </IconButton>
-                    </Box>
+
                 </Toolbar>
             </AppBar>
-            {
-                renderMobileMenu
-            }
+
             {
                 renderMenu
             }
+
+            <Drawer anchor="left" open={isMobileSize && drawerOpen} onClose={handleDrawerClose}>
+                {drawerContent}
+            </Drawer>
         </Box>
     )
         ;
