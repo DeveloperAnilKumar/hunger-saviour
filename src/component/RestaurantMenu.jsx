@@ -10,12 +10,11 @@ const RestaurantMenu = () => {
     const [expandedMenu, setExpandedMenu] = useState(null);
     const [restaurant, setRestaurant] = useState({});
     const {id} = useParams();
-    const {user , isLogging} = useSelector((state) => state.auth);
+    const {user, isLogging} = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const {cartItems} = useSelector((state) => state.cart)
 
     const navigate = useNavigate()
-
 
     const handleToggleDescription = (menu) => {
         if (expandedMenu === menu) {
@@ -37,29 +36,37 @@ const RestaurantMenu = () => {
     }, [id]);
 
     const decreaseQuantity = (menu) => {
-        const menuItem = {...menu, quantity: menu.quantity - 1};
-        fetch(BASE_URL + "/cart/update/" + menu._id, {
-            method: "PATCH",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(menuItem)
-        })
-            .then(res => res.json())
-            .then(data => {
-                setRestaurant(prevState => ({
-                    ...prevState,
-                    restaurantMenu: prevState.restaurantMenu.map(item =>
-                        item._id === data._id ? data : item
-                    )
-                }));
-                dispatch(decrement(data));
+        let newQuantity = menu.quantity - 1;
+        const menuItem = {...menu, quantity: newQuantity};
+        if (menuItem.quantity > 0) {
+            fetch(BASE_URL + "/cart/update/" + menu._id, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(menuItem)
             })
-            .catch(error => console.error("Error updating menu item:", error));
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error("Failed to update menu item");
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (menuItem.quantity >= 1) {
+                        dispatch(decrement(menuItem))
+                    }
+                })
+                .catch(error => {
+                    console.error("Error updating menu item:", error);
+                    alert("Failed to update cart item");
+                });
+        }
+
     };
 
     const increaseQuantity = (menu) => {
-
         const menuItem = {...menu, quantity: menu.quantity + 1};
-        console.log(menuItem)
         fetch(BASE_URL + "/cart/update/" + menu._id, {
             method: "PATCH",
             headers: {"Content-Type": "application/json"},
@@ -80,7 +87,7 @@ const RestaurantMenu = () => {
             menuItemPrice: menu.menuItemPrice,
             menuType: menu.menuType,
             quantity: 1,
-            userId:user._id
+            userId: user._id
         };
 
         fetch(BASE_URL + "/cart/add", {
@@ -91,20 +98,15 @@ const RestaurantMenu = () => {
             .then(res => res.json())
             .then(data => {
                 dispatch(addToCart(data));
-                getRestaurantData();
-                console.log(data)
+                getRestaurantData()
                 alert("Added cart item successfully");
             })
             .catch(error => console.error("Error adding cart item:", error));
     };
 
-
-
-
-
-
     return (
         <div className="container flex flex-wrap items-center justify-center my-2 ">
+
             {restaurant?.restaurantMenu?.map((menu, index) => (
                 <div key={index} className="container flex flex-wrap items-center justify-center my-2 p-5 ">
                     <div className="lg:w-7/12 p-0">
@@ -144,42 +146,48 @@ const RestaurantMenu = () => {
                         </div>
                     </div>
                     <div className="lg:w-2/12">
+                        {isLogging === true ? (
+                            <Card style={{width: "200px", boxShadow: "none"}} className="no-shadow">
+                                <CardContent style={{height: "150px"}} className="flex items-center justify-center">
+                                    {cartItems.some(item => item.restaurantMenu._id === menu._id) ? (
+                                        <>
+                                            <Button
+                                                onClick={() => decreaseQuantity(cartItems.find(item => item.restaurantMenu._id === menu._id))}
+                                                variant="contained"
+                                                color="primary" className="font-bold text-light m-2"
+                                                size="small"
+                                                sx={{backgroundColor: "#FC8019"}}><Remove/></Button>
 
-                            {isLogging===true ? (
-                                    <Card style={{ width: "200px", boxShadow: "none" }} className="no-shadow">
-                                        <CardContent style={{ height: "150px" }} className="flex items-center justify-center">
-                                            <Button onClick={() => addToCartItem(menu)} variant="contained" sx={{ backgroundColor: "#FC8019" }} className="font-bold text-light">
-                                                Add To Cart
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
-                                ) : (
-                                <Card style={{ width: "200px", boxShadow: "none" }} className="no-shadow">
-                                    <CardContent style={{ height: "150px" }} className="flex items-center justify-center">
-                                    <Button variant="contained" sx={{ backgroundColor: "#FC8019" }} className="font-bold text-light" onClick={() => navigate("/signin") }>
-                                         Add to Cart
+                                            <div
+                                                className="font-bold text-muted p-2">{cartItems.find(item => item.restaurantMenu._id === menu._id).quantity}</div>
+                                            <Button
+                                                onClick={() => increaseQuantity(cartItems.find(item => item.restaurantMenu._id === menu._id))}
+                                                variant="contained"
+                                                color="primary" className="font-bold text-xl text-light m-2"
+                                                size="small" sx={{backgroundColor: "#FC8019"}}><Add/></Button>
+                                        </>
+                                    ) : (
+                                        <Button onClick={() => addToCartItem(menu)} variant="contained"
+                                                sx={{backgroundColor: "#FC8019"}} className="font-bold text-light">
+                                            Add To Cart
+                                        </Button>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <Card style={{width: "200px", boxShadow: "none"}} className="no-shadow">
+                                <CardContent style={{height: "150px"}} className="flex items-center justify-center">
+                                    <Button variant="contained" sx={{backgroundColor: "#FC8019"}}
+                                            className="font-bold text-light" onClick={() => navigate("/signin")}>
+                                        Add to Cart
                                     </Button>
-                                    </CardContent>
-                                </Card>
-                                )}
+                                </CardContent>
+                            </Card>
+                        )}
 
                     </div>
                 </div>
             ))}
-
-                { isLogging && cartItems.map((item, index) => (
-                        <div key={index} className="flex items-center">
-                            <Button onClick={() => decreaseQuantity(item)} variant="contained"
-                                    color="primary" className="font-bold text-light m-2"
-                                    size="small"
-                                    sx={{ backgroundColor: "#FC8019" }}><Remove /></Button>
-                            <div className="font-bold text-muted p-2">{item.quantity}</div>
-                            <Button onClick={() => increaseQuantity(item)} variant="contained"
-                                    color="primary" className="font-bold text-xl text-light m-2"
-                                    size="small" sx={{ backgroundColor: "#FC8019" }}><Add /></Button>
-                        </div>
-                    ))}
-
         </div>
     );
 };

@@ -15,9 +15,31 @@ import {useDispatch, useSelector} from "react-redux";
 import {BASE_URL, navigationLinks} from "./db.jsx";
 import {userLogout} from "../redux/slice/authSlice.jsx";
 import Avatar from "@mui/material/Avatar";
-import {Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
+import {
+    Divider,
+    Drawer,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    useMediaQuery
+} from "@mui/material";
 import {useState} from "react";
+import {createTheme} from "@mui/material/styles";
 
+
+const theme = createTheme({
+    breakpoints: {
+        values: {
+            xs: 0,
+            sm: 600,
+            md: 900,
+            lg: 1200,
+            xl: 1536,
+        },
+    },
+});
 
 export default function Navbar() {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -44,6 +66,9 @@ export default function Navbar() {
 
     }
 
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
 
 
     const handleProfileMenuOpen = (event) => {
@@ -58,7 +83,6 @@ export default function Navbar() {
         setAnchorEl(null);
         handleMobileMenuClose();
     };
-
 
 
     const handleDrawerClose = () => {
@@ -79,19 +103,38 @@ export default function Navbar() {
             {isLogging ? (
                 [
                     <MenuItem key="profile" onClick={handleMenuClose} component={Link} to="/profile">
-                        <Person sx={{ marginRight: 1 }} /> Profile
+                        <Person sx={{
+
+                            marginRight: 1,
+                            color: "#FC8019"
+                        }}/> Profile
                     </MenuItem>,
                     <MenuItem key="signout" onClick={logout}>
-                        <ExitToApp sx={{ marginRight: 1 }} /> Sign Out
+                        <ExitToApp sx={{
+
+                            marginRight: 1,
+                            color: "#FC8019"
+                        }}/> Sign Out
                     </MenuItem>
                 ]
             ) : (
                 [
-                    <MenuItem key="signin" onClick={handleMenuClose} component={Link} to="/signin">
-                        <Lock sx={{ marginRight: 1 }} /> Sign In
+                    <MenuItem key="signin" onClick={handleMenuClose} component={Link} to="/signin"
+
+
+                    >
+                        <Lock sx={{
+
+                            marginRight: 1,
+                            color: "#FC8019"
+                        }}/> Sign In
                     </MenuItem>,
                     <MenuItem key="signup" onClick={handleMenuClose} component={Link} to="/signup">
-                        <Person sx={{ marginRight: 1 }} /> Sign Up
+                        <Person sx={{
+
+                            marginRight: 1,
+                            color: "#FC8019"
+                        }}/> Sign Up
                     </MenuItem>
                 ]
             )}
@@ -99,64 +142,78 @@ export default function Navbar() {
     );
 
 
-
-
     const drawerContent = (
-        <Box sx={{ width: 250 }} role="presentation" onClick={handleDrawerClose}>
+        <Box sx={{width: 250}} role="presentation" onClick={handleDrawerClose}>
+
             <List>
                 {
                     isLogging &&
-                        navigationLinks.map((nav, index) => (
-                            <ListItem key={index} disablePadding component={NavLink} to={nav.path}
+                    navigationLinks.map((nav, index) => (
+                        <ListItem key={index} disablePadding component={NavLink} to={nav.path}
 
-                            >
-                                <ListItemButton   >
-                                    <ListItemIcon  sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        fontSize: "1rem",
-                                        color: "#FC8019"
-                                    }}>
-                                        {nav.icon}
-                                    </ListItemIcon>
-                                    <ListItemText primary={nav.text} />
-                                </ListItemButton>
-                            </ListItem>
-                        ))
+                        >
+                            <ListItemButton>
+                                <ListItemIcon sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    fontSize: "1rem",
+                                    color: "#FC8019"
+                                }}>
+                                    {nav.icon}
+                                </ListItemIcon>
+                                <ListItemText primary={nav.text}/>
+                            </ListItemButton>
+                        </ListItem>
+                    ))
                 }
             </List>
 
             <List>
                 {isLogging ? (
                     <>
-                        <ListItem  component={Link} to="/profile">
+                        <ListItem component={Link} to="/profile">
                             <ListItemIcon>
-                                <Avatar src={user.image}  sx={{ width: 24, height: 24 }} />
+                                <Avatar src={user.image} sx={{width: 24, height: 24}}/>
                             </ListItemIcon>
                             <ListItemText sx={{
-                                textTransform:"capitalize"
-                            }} primary= {`${user.firstName} ${user.lastName}`} />
+                                textTransform: "capitalize"
+                            }} primary={`${user.firstName} ${user.lastName}`}/>
                         </ListItem>
-                        <ListItem  onClick={logout}>
-                            <ListItemIcon>
-                                <ExitToApp />
+                        <ListItem onClick={logout}>
+                            <ListItemIcon sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                fontSize: "1rem",
+                                color: "#FC8019"
+                            }}>
+                                <ExitToApp/>
                             </ListItemIcon>
-                            <ListItemText primary="Sign Out" />
+                            <ListItemText primary="Sign Out"/>
                         </ListItem>
                     </>
                 ) : (
                     <>
-                        <ListItem  component={Link} to="/signin">
-                            <ListItemIcon>
-                                <Lock />
+                        <ListItem component={Link} to="/signin">
+                            <ListItemIcon sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                fontSize: "1rem",
+                                color: "#FC8019"
+                            }}>
+                                <Lock/>
                             </ListItemIcon>
-                            <ListItemText primary="Sign In" />
+                            <ListItemText primary="Sign In"/>
                         </ListItem>
-                        <ListItem  component={Link} to="/signup">
-                            <ListItemIcon>
-                                <Person />
+                        <ListItem component={Link} to="/signup">
+                            <ListItemIcon sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                fontSize: "1rem",
+                                color: "#FC8019"
+                            }}>
+                                <Person/>
                             </ListItemIcon>
-                            <ListItemText primary="Sign Up" />
+                            <ListItemText primary="Sign Up"/>
                         </ListItem>
                     </>
                 )}
@@ -165,35 +222,46 @@ export default function Navbar() {
     );
 
 
+    const isMobileSize = useMediaQuery(theme.breakpoints.down("md"))
 
-    const isMobileSize = "md"
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+
 
     return (
         <Box sx={{flexGrow: 1}}>
-            <AppBar position="static" color="default" sx={{
-                backgroundColor: "white"
-            }}>
+            <AppBar position="sticky">
                 <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        sx={{mr: 2}}
-                        onClick={handleDrawerOpen}
-                    >
-                        <MenuIcon/>
+                    {
+                        isMobileSize && <IconButton
+                            size="large"
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            sx={{mr: 2}}
+                            onClick={handleDrawerOpen}
+                        >
+                            <MenuIcon/>
 
-                    </IconButton>
+
+                        </IconButton>
+                    }
+
                     <Typography
                         variant="h6"
                         noWrap
                         component="div"
                         sx={{display: {xs: 'none', sm: 'block'}, color: "#FC8019", fontSize: "1.5rem"}}
                     >
-                        Hunger Saviour <Restaurant/>
+                        <Link to="/"> Hunger Saviour <Restaurant/> </Link>
                     </Typography>
 
+                    {
+                        isMobile && <Link to="/">
+                            <div className="flex items-center text-[#FC8019] ">
+                                <p className="text-2xl font-bold font-serif">H</p>  <Restaurant/>
+                            </div>
+                        </Link>
+                    }
                     <Box sx={{flexGrow: 1}}/>
 
                     {
@@ -239,7 +307,6 @@ export default function Navbar() {
                                 ))}
 
 
-
                                 <IconButton
                                     size="large"
                                     edge="end"
@@ -255,7 +322,8 @@ export default function Navbar() {
                                         color: "#FC8019"
                                     }}>
 
-                                    <Avatar src={user.image}  sx={{ width: 24, height: 24 }} /> <span className="text-slate-800 mx-1 capitalize">  {user.firstName} {user.lastName} </span>
+                                    <Avatar src={user.image} sx={{width: 24, height: 24}}/> <span
+                                    className="text-slate-800 mx-1 capitalize">  {user.firstName} {user.lastName} </span>
                                 </IconButton>
 
                             </Box>
@@ -307,7 +375,60 @@ export default function Navbar() {
                                 </IconButton>
                             </Box>)
                     }
+                    <Box sx={{display: {xs: 'flex', md: 'none'}}}>
 
+
+                        {
+                            isLogging ? (<Link to="/cart">
+                                    <IconButton size="large" aria-label="show 4 new mails" color="inherit"
+
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    fontSize: "1rem",
+                                                    color: "#FC8019"
+                                                }}>
+
+                                        <Badge badgeContent={cartItems.length === 0 ? "0" : cartItems.length}
+                                               color="error">
+                                            <ShoppingCart/>
+                                        </Badge>
+                                    </IconButton>
+                                </Link>) :
+
+                                <Link to="/signin">
+                                    <IconButton size="large" aria-label="show 4 new mails" color="inherit"
+
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    fontSize: "1rem",
+                                                    color: "#FC8019"
+                                                }}>
+
+                                        <Badge badgeContent={"0"}
+                                               color="error">
+                                            <ShoppingCart/>
+                                        </Badge>
+                                    </IconButton>
+                                </Link>
+                        }
+
+
+                        <IconButton aria-label="show more" aria-controls="menu-appbar" aria-haspopup="true"
+                                    onClick={handleMenuOpen} color="inherit">
+                            {
+                                isLogging ?
+                                    <Avatar src={user.image} sx={{width: 24, height: 24}}/>
+                                    :
+                                    <AccountCircle sx={{
+                                        color: "#FC8019"
+
+                                    }}/>
+                            }
+
+                        </IconButton>
+                    </Box>
 
                 </Toolbar>
             </AppBar>
@@ -316,7 +437,9 @@ export default function Navbar() {
                 renderMenu
             }
 
-            <Drawer anchor="left" open={isMobileSize && drawerOpen} onClose={handleDrawerClose}>
+            <Drawer sx={{
+                marginTop: "2rem"
+            }} anchor="left" open={isMobileSize && drawerOpen} onClose={handleDrawerClose}>
                 {drawerContent}
             </Drawer>
         </Box>

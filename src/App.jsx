@@ -19,7 +19,7 @@ function App() {
     const {user} = useSelector((state)=> state.auth)
 
     useEffect(() => {
-        if (!user) {
+        if (user!=null) {
             fetch(BASE_URL + "/cart/items/" + user._id)
                 .then((res) => res.json())
                 .then((data) => dispatch(getAllCartItems(data)))
